@@ -7,7 +7,7 @@ from copy import copy
 from pathlib import Path
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-__version__ = '0.07'
+__version__ = '0.08'
 
 # This is the entry point for jupyter-server-proxy . The packaging metadata
 # tells it about this function. For details, see:
@@ -31,12 +31,17 @@ def setup_memos():
 # This example uses Python's low-level http.server, to minimise dependencies.
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
+        # 處理 favicon 請求
+        if self.path == '/favicon.svg':
+            self.serve_svg_file('/opt/tljh/hub/share/jupyterhub/memos.svg')
+            return
+        
         server_addr = self.server.server_address
         if isinstance(server_addr, tuple):
             server_addr = "{}:{}".format(*server_addr)
-
         try:
             self.send_response(200)
+            self.send_header('Content-type', 'text/html')
             self.end_headers()
             self.wfile.write(TEMPLATE.format(
                 path=self.path, headers=self._headers_hide_cookie(),
@@ -46,6 +51,21 @@ class RequestHandler(BaseHTTPRequestHandler):
             # Connection closed without the client reading the whole response.
             # Not a problem for the server.
             pass
+    
+    def serve_svg_file(self, filepath):
+        """提供 SVG 檔案"""
+        try:
+            with open(filepath, 'rb') as f:
+                svg_content = f.read()
+            self.send_response(200)
+            self.send_header('Content-type', 'image/svg+xml')
+            self.send_header('Content-Length', str(len(svg_content)))
+            self.end_headers()
+            self.wfile.write(svg_content)
+        except FileNotFoundError:
+            self.send_error(404, 'File not found')
+        except Exception as e:
+            self.send_error(500, f'Internal server error: {str(e)}')
 
     def address_string(self):
         # Overridden to fix logging when serving on Unix socket
@@ -63,12 +83,15 @@ class RequestHandler(BaseHTTPRequestHandler):
             res['Cookie'] = '(hidden)'
         return res
 
-
+# 方案一：使用視窗高度 (viewport height)
 TEMPLATE = """\
 <!DOCTYPE html>
 <html>
 <head>
-    <title>FlowiseAI</title>
+    <title>Tutorials</title>
+    <!-- 使用本地的 memos.svg 作為 favicon -->
+    <link rel="icon" type="image/svg+xml" href="/memos.svg">
+    
     <style>
         body {{
             margin: 0;
@@ -102,6 +125,7 @@ def main():
         # 127.0.0.1 = localhost: only accept connections from the same machine
         print("TCP server on port", int(args.port))
         httpd = HTTPServer(('127.0.0.1', int(args.port)), RequestHandler)
+
     print("Launching example HTTP server")
     httpd.serve_forever()
 
