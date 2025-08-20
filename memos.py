@@ -7,7 +7,7 @@ from copy import copy
 from pathlib import Path
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-__version__ = '0.08'
+__version__ = '0.09'
 
 # This is the entry point for jupyter-server-proxy . The packaging metadata
 # tells it about this function. For details, see:
@@ -90,7 +90,7 @@ TEMPLATE = """\
 <head>
     <title>Tutorials</title>
     <!-- 使用本地的 memos.svg 作為 favicon -->
-    <link rel="icon" type="image/svg+xml" href="/memos.svg">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     
     <style>
         body {{
