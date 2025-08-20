@@ -7,7 +7,7 @@ from copy import copy
 from pathlib import Path
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-__version__ = '0.10'
+__version__ = '0.11'
 
 # This is the entry point for jupyter-server-proxy . The packaging metadata
 # tells it about this function. For details, see:
@@ -69,7 +69,7 @@ TEMPLATE = """\
 <html>
 <head>
     <title>Tutorials</title>
-    <link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/95764151?s=48&v=4">
+    <link rel="icon" type="image/webp" href="https://raw.githubusercontent.com/usememos/memos/refs/heads/main/web/public/logo.webp">
     
     <style>
         body {{
